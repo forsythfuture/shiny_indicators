@@ -1,0 +1,9 @@
+year,geo_description,type,subtype,estimate,success,trials,se
+2017,North Carolina,Comparison Community,Total,7.1,825,116197,0.24719046621329255
+2017,"Forsyth County, NC",Comparison Community,Total,9.8,43,4388,1.494444284419555
+2017,North Carolina,Race / Ethnicity,"White, non-Hispanic",5,325,65000,0.2773500981126146
+2017,"Forsyth County, NC",Race / Ethnicity,"White, non-Hispanic",4.5,9,2000,1.5
+2017,North Carolina,Race / Ethnicity,African American,12.5,361,28880,0.6578947368421052
+2017,"Forsyth County, NC",Race / Ethnicity,African American,19.3,25,1295,3.8605018978722057
+2017,North Carolina,Race / Ethnicity,Hispanic/Latino,5.7,106,18596,0.553640253821697
+2017,"Forsyth County, NC",Race / Ethnicity,Hispanic/Latino,8.7,8,920,3.075145807783825
