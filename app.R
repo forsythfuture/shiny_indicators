@@ -45,8 +45,16 @@ ui <- dashboardPage(
     
     radioButtons("sig_test", "Significance Test:",
                  c("Z-score" = "zscore",
-                   "Chi-Square" = "chisquare"),
+                   "Chi-Square" = "chi-square"),
                  selected = 'zscore'),
+    
+    # select box to rates for chi-square
+    selectInput("rate_adjust", "Rate:",
+                c('1' = 1,
+                  '1000' = 1000,
+                  '10000' = 10000,
+                  '100000' = 100000),
+                selected = '1'),
     
     # download tableau data buttom
     downloadButton("download_tableau", "Download Tableau")
@@ -130,7 +138,20 @@ ui <- dashboardPage(
                              numerator in the percentile: number of graduates, infant deaths, or crimes."),
                      tags$li('trails (optional): Like success, this column can be used for binomial data. It is the denominator in a percentile and represents 
                              the total number of chances for a success: total students, total births, total population.'),
-                     tags$li("se: Standard error of the estimate. Use all zeroes as a placeholder if the data does not contain standard errors .")
+                     tags$li("se: Standard error of the estimate. Use all zeroes as a placeholder if the data does not contain standard errors."),
+                     tags$p(),
+                     tags$h4("Tests and estimates tab"),
+                     tags$p("The top table in the Tests and Estimates tab, labeled 'Significance Tests', displays the results of a significance
+                             test between the observation listed in the row and the observation listed in the column. All tests are two-sided
+                             with a null-hypothesis that there is no difference between the two observations."),
+                     tags$p("The right radial buttom labeled 'Significance Test' allows the use to specify the type of test. 'Z-score' calculates
+                            the z test statistic and converts this statistic to a p-value. To use this test, the data set must contain 'estimate'
+                            and 'se' (standard errors) columns. The 'Chi-Square' radial conducts a chi-square test of proportions using the R function prop.test(). 
+                            This test uses the 'success' and 'trials' columns. For both tests, p-values at 0.05 or below are in bold, signifying statistical significance."),
+                     tags$p("The bottom table displays the differences between observations, along with 95% confidence intervals
+                            of the estimated differences. The confidence intervals are constructed from the standard errors when the 'Z-score'
+                            significance test is selected. When the 'Chi-Square' significance test is selected, the confidence intervals are 
+                            calculated from a binomial distribution generated with the 'success' and 'trials' columns.")
                    ) # unordered list
           ) # tab panel for instructions
         ) # tabsetPanel
@@ -220,7 +241,7 @@ server <- function(input, output, session) {
              subtype %in% input$demo_check) %>%
       ff_estimates_ci(., 'estimate', 'se',
                       format = if (input$sig_test == 'zscore') 'continuous' else 'binomial',
-                      success = 'success', trials = 'trials',
+                      success = 'success', trials = 'trials', rate_per_unit = as.integer(input$rate_adjust),
                       var_names = c('year', 'geo_description', 'subtype'),
                       pretty_print = TRUE, table_name = 'Estimates of differences and 95% CIs of estimates')
     
