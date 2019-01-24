@@ -1,6 +1,10 @@
+################################################################################
 #
-# This app is a test app for the updated indicators app
+# This app allows users to upload a dataset, and then the app will create charts
+# and conduct significance tests on the dataset. Its primary use is for work with
+# indicators.
 #
+################################################################################
 
 library(shiny)
 library(shinydashboard)
@@ -9,7 +13,7 @@ library(plotly)
 library(DT)
 library(kableExtra)
 library(FFtools)
-# https://raw.githubusercontent.com/forsythfuture/indicators/master/shiny_datasets/housing_burden_shiny.csv
+
 # load all custom functions
 source('global.R')
 
@@ -112,23 +116,23 @@ ui <- dashboardPage(
                                        Then, click on the 'Raw' button on the top-right side of the header that is 
                                        shown just above the dataset. Finally, copy the URL from the address bar.",
                                        tags$p("A sample of GitHub datasets is available here:"),
-                                       tags$a(herf=github_datasets, github_datasets)),
+                                       tags$a(href=github_datasets, github_datasets)),
                                tags$p(),
                                tags$li("Google Drive: Right-click on the file and click 'Share'. Then, change the permissions to 
-                                       'On - Anyone with the link'.  After changing the file's permissions, copy the sharable link.",
+                                       'On - Anyone with the link'.  After changing the file's permissions, copy the shareable link.",
                                        tags$p("Note: Google Drive support is experimental and you may encounter bugs.")))
                                ) # web address list
                    ), # numbered list
                    tags$p(),
                    tags$h4("Formatting Data"),
-                   tags$p("For the app to work, the uploaded dataset must be properly formatted. The table below shows an example of the proper formatting"),
+                   tags$p("For the app to work, the uploaded dataset must be properly formatted. The table below shows an example of the proper formatting:"),
                    # table that contains the example format dataset
                    tableOutput('formatting_example'),
-                   tags$p("And here is a description of each column:"),
+                   tags$p("Below is a description of each column:"),
                    tags$ul(
                      tags$li("year:  The year for the given data point in the row."),
                      tags$li("geo_description: The description of the geographic area. For counties, follow the format shown in the table for Forsyth County"),
-                     tags$li("type: The type of demograhic group (Race / Ethnicity, Age, Gender, etc.). If the row represents the aggregate for the geographic area
+                     tags$li("type: The type of demographic group (Race / Ethnicity, Age, Gender, etc.). If the row represents the aggregate for the geographic area
                              then use 'Comparison Community' for type."),
                      tags$li("subtype: The specific demographic group (African American, 18 to 35, Female, etc). Use 'Total' for aggregates of the entire geographic area."),
                      tags$li("estimate: The point estimate of interest (unemployment rate, median wages, crime rate, etc.)."),
@@ -138,21 +142,26 @@ ui <- dashboardPage(
                              numerator in the percentile: number of graduates, infant deaths, or crimes."),
                      tags$li('trails (optional): Like success, this column can be used for binomial data. It is the denominator in a percentile and represents 
                              the total number of chances for a success: total students, total births, total population.'),
-                     tags$li("se: Standard error of the estimate. Use all zeroes as a placeholder if the data does not contain standard errors."),
-                     tags$p(),
-                     tags$h4("Tests and estimates tab"),
-                     tags$p("The top table in the Tests and Estimates tab, labeled 'Significance Tests', displays the results of a significance
-                             test between the observation listed in the row and the observation listed in the column. All tests are two-sided
-                             with a null-hypothesis that there is no difference between the two observations."),
-                     tags$p("The right radial buttom labeled 'Significance Test' allows the use to specify the type of test. 'Z-score' calculates
-                            the z test statistic and converts this statistic to a p-value. To use this test, the data set must contain 'estimate'
-                            and 'se' (standard errors) columns. The 'Chi-Square' radial conducts a chi-square test of proportions using the R function prop.test(). 
-                            This test uses the 'success' and 'trials' columns. For both tests, p-values at 0.05 or below are in bold, signifying statistical significance."),
-                     tags$p("The bottom table displays the differences between observations, along with 95% confidence intervals
-                            of the estimated differences. The confidence intervals are constructed from the standard errors when the 'Z-score'
-                            significance test is selected. When the 'Chi-Square' significance test is selected, the confidence intervals are 
-                            calculated from a binomial distribution generated with the 'success' and 'trials' columns.")
-                   ) # unordered list
+                     tags$li("se: Standard error of the estimate. Use all zeroes as a placeholder if the data does not contain standard errors.")
+                   ), # unordered list
+                  tags$p(),
+                  tags$h4("Tests and estimates tab"),
+                  tags$p("The top table in the Tests and Estimates tab, labeled 'Significance Tests', displays the results of a significance
+                         test between the observation listed in the row and the observation listed in the column. All tests are two-sided
+                         with a null-hypothesis that there is no difference between the two observations."),
+                  tags$p("The left radial button labeled 'Significance Test' allows the use to specify the type of test. 'Z-score' calculates
+                        the z test statistic and converts this statistic to a p-value. To use this test, the data set must contain 'estimate'
+                        and 'se' (standard errors) columns. The 'Chi-Square' radial conducts a chi-square test of proportions using the R function prop.test(). 
+                        This test uses the 'success' and 'trials' columns. For both tests, p-values at 0.05 or below are in bold, signifying statistical significance."),
+                  tags$p("The bottom table displays the differences between observations, along with 95% confidence intervals
+                        of the estimated differences. The confidence intervals are constructed from the standard errors when the 'Z-score'
+                        significance test is selected. When the 'Chi-Square' significance test is selected, the confidence intervals are 
+                        calculated from a binomial distribution generated with the 'success' and 'trials' columns."),
+                  tags$p(),
+                  tags$h4("'Rate:' drop-down menu"),
+                  tags$p("The 'Rate:' drop-down menu allows users to change the rate of proportions. For example, the infant mortality
+                         rate is the number of deaths per 1000 live births. In this case, the rate would be 1000. This feature only works if
+                         a Chi-Square significance test is used and the dataset contains columns for success and trials.")
           ) # tab panel for instructions
         ) # tabsetPanel
       ) # fluidRow
