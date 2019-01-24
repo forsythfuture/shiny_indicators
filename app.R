@@ -8,7 +8,8 @@ library(tidyverse)
 library(plotly)
 library(DT)
 library(kableExtra)
-
+library(FFtools)
+# https://raw.githubusercontent.com/forsythfuture/indicators/master/shiny_datasets/housing_burden_shiny.csv
 # load all custom functions
 source('global.R')
 
@@ -69,6 +70,8 @@ ui <- dashboardPage(
                    checkboxGroupInput('demo_check', 'Demographic:', choices = "", inline = TRUE),
                    tags$h4('Significance Tests'),
                    tableOutput('table_sigtest'),
+                   tags$p(),
+                   tags$hr(),
                    tags$p(),
                    tags$h4('Estimates of differences and 95% confidence intervals'),
                    tags$p('Differences are columns minus rows'),
@@ -202,10 +205,10 @@ server <- function(input, output, session) {
       filter(year %in% input$year_check,
              geo_description %in% input$geo_check,
              subtype %in% input$demo_check) %>%
-      ff_acs_zscore_kable('estimate', 'se', test = input$sig_test, success = success, trials = trials,
-                          var_names = c('year', 'geo_description', 'subtype' ),
-                          table_name = if (input$sig_test == 'zscore') paste0('Z', sig_text) else (paste0('Chi-square', sig_text)))
-
+      ff_sigtest(., 'estimate', 'se', test = input$sig_test, success = 'success', trials = 'trials',
+                 var_names = c('year', 'geo_description', 'subtype' ), pretty_print = TRUE, 
+                 table_name = if (input$sig_test == 'zscore') paste0('Z', sig_text) else (paste0('Chi-square', sig_text)))
+    
   }
   
   # create estimates and confidence intervals table
@@ -215,8 +218,11 @@ server <- function(input, output, session) {
       filter(year %in% input$year_check,
              geo_description %in% input$geo_check,
              subtype %in% input$demo_check) %>%
-      estimates_ci_kable('estimate', 'se', test = input$sig_test, success = success, trials = trials,
-                         var_names = c('year', 'geo_description', 'subtype' ))
+      ff_estimates_ci(., 'estimate', 'se',
+                      format = if (input$sig_test == 'zscore') 'continuous' else 'binomial',
+                      success = 'success', trials = 'trials',
+                      var_names = c('year', 'geo_description', 'subtype'),
+                      pretty_print = TRUE, table_name = 'Estimates of differences and 95% CIs of estimates')
     
   }
   
