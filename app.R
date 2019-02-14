@@ -85,7 +85,7 @@ ui <- dashboardPage(
           # significance testing panel
           tabPanel('Tests and Estimates',
                    checkboxGroupInput('year_check', 'Years:', choices = "", selected = "", inline = TRUE),
-                   checkboxGroupInput('geo_check', 'Geography:', "", selected = '', inline = TRUE),
+                   checkboxGroupInput('geo_check', 'Geography:', choices = "", inline = TRUE),
                    checkboxGroupInput('demo_check', 'Demographic:', choices = "", inline = TRUE),
                    tags$h4('Significance Tests'),
                    tableOutput('table_sigtest'),
@@ -236,7 +236,7 @@ server <- function(input, output, session) {
     updateCheckboxGroupInput(session, 'year_check', choices = unique(df_demo()$year), 
                              selected = max(df$year), inline=TRUE)
     updateCheckboxGroupInput(session, 'geo_check', choices = unique(df_demo()$geo_description), 
-                             selected = 'Forsyth County, NC',  inline=TRUE)
+                             selected = unique(df_demo()$geo_description),  inline=TRUE)
     updateCheckboxGroupInput(session, 'demo_check', choices = unique(df_demo()$subtype), 
                              selected = unique(df_demo()$subtype),  inline=TRUE)
   })
