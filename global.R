@@ -1,4 +1,4 @@
-plotly_plots <- function(df, input_type, plot_type) {
+plotly_plots <- function(df, input_type, input_geo, plot_type) {
   
   # save most recent year as object to be used in plots
   recent_year <- max(df$year)
@@ -28,8 +28,8 @@ plotly_plots <- function(df, input_type, plot_type) {
   if (plot_type == 'line') {
     
     df %>%
-      # if the demographic is not comparison community then we only want Forsyth County data
-      filter(geo_description == if (input_type != 'Comparison Community') 'Forsyth County, NC' else .$geo_description) %>%
+      # if the demographic is not comparison community then we only want the selected geographic area
+      filter(geo_description == if (input_type != 'Comparison Community') input_geo else .$geo_description) %>%
       plot_ly(x = ~year, y = ~estimate, 
               color = if (input_type == 'Comparison Community') ~geo_description else ~subtype, 
               mode = 'lines', type = 'scatter',

@@ -13,6 +13,7 @@ library(plotly)
 library(DT)
 library(kableExtra)
 library(FFtools)
+library(googledrive)
 
 # load all custom functions
 source('global.R')
@@ -20,6 +21,7 @@ source('global.R')
 # text to paste on significance testing table name
 sig_text <- ' test of significance'
 
+# https://raw.githubusercontent.com/forsythfuture/indicators/master/shiny_datasets/crime.csv
 # web address to GitHub folder containg datasets that can be used in shiny
 github_datasets <- 'https://github.com/forsythfuture/indicators/tree/master/shiny_datasets'
 
@@ -44,6 +46,11 @@ ui <- dashboardPage(
     # demographic drop down menu
     # will not display until data file is selected
     selectInput('demographic', 'Demographic:', ""),
+    
+    # geographic area drop down menu
+    # controls which geographic area will be used for demographic line plots
+    # will not display until data file is selected
+    selectInput('geo_area', 'Geographic Area:', ""),
     
     tags$p(),
     
@@ -199,22 +206,28 @@ server <- function(input, output, session) {
     filter(df$data, type == !!input$demographic)
 
   })
-  # 
-  # # create demographic drop-down menu
+  
+  # create demographic drop-down menu
   observe({
     updateSelectInput(session, 'demographic',
                       choices = df$demographics)
   })
   
+  # create area drop-down menu
+  observe({
+    updateSelectInput(session, 'geo_area',
+                      choices = df$geographies)
+  })
+  
   # create plots 
   output$plot_line <- renderPlotly({
     if (is.null(df$data)) return()
-    plotly_plots(df_demo(), input$demographic, 'line')
+    plotly_plots(df_demo(), input$demographic, input$geo_area, 'line')
   })
   
   output$plot_bar <- renderPlotly({
     if (is.null(df$data)) return()
-    plotly_plots(df_demo(), input$demographic, 'bar')
+    plotly_plots(df_demo(), input$demographic, plot_type = 'bar')
   })
   
   # update significance testing checkboxes based on dataset
