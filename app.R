@@ -85,7 +85,7 @@ ui <- dashboardPage(
           # significance testing panel
           tabPanel('Tests and Estimates',
                    checkboxGroupInput('year_check', 'Years:', choices = "", selected = "", inline = TRUE),
-                   checkboxGroupInput('geo_check', 'Geography:', "", selected = 'Forsyth County, NC', inline = TRUE),
+                   checkboxGroupInput('geo_check', 'Geography:', "", selected = '', inline = TRUE),
                    checkboxGroupInput('demo_check', 'Demographic:', choices = "", inline = TRUE),
                    tags$h4('Significance Tests'),
                    tableOutput('table_sigtest'),
