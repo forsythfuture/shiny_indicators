@@ -13,7 +13,6 @@ library(plotly)
 library(DT)
 library(kableExtra)
 library(FFtools)
-library(googledrive)
 
 # load all custom functions
 source('global.R')
