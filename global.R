@@ -1,14 +1,14 @@
 plotly_plots <- function(df, input_type, input_geo, plot_type) {
   
   # determine if the dataset is binomial by whether it has a standard error column
-  binomial <- if ("se" %in% colnames(df)) TRUE else FALSE
+  binomial <- if ("se" %in% colnames(df)) FALSE else TRUE
   
   # if there are success and trial columns, create confidence intervals
-  if (binomial == FALSE) {
+  if (binomial == TRUE) {
     
     conf_int <- Hmisc::binconf(x = df$success, 
                              n = df$trials,
-                             alpha = .95,
+                             alpha = .05,
                              return.df = T) %>%
                       select(-PointEst)
     
@@ -31,7 +31,7 @@ plotly_plots <- function(df, input_type, input_geo, plot_type) {
   # create function for tool tip, since it will be used in all plots
   # easiest to create an empty function instead of object since objects are used in the funtion
   # will need to use different tooltipes for binomial and continuous
-  if (binomial == TRUE) {
+  if (binomial == FALSE) {
     
     tool_tip <- function() {
       ~paste0("Geography: ", geo_description,
@@ -48,9 +48,9 @@ plotly_plots <- function(df, input_type, input_geo, plot_type) {
         ~paste0("Geography: ", geo_description,
                 "<br>Year:  ", year,
                 "<br>Demographic:  ", subtype,
-                "<br>Estimate:  ", round( estimate, 4),
-                "<br>Lower CI:  ", round( Lower, 4),
-                "<br>Upper CI:  ", round( Upper, 4))  
+                "<br>Estimate:  ", round( estimate, 3),
+                "<br>Lower CI:  ", round( Lower, 3),
+                "<br>Upper CI:  ", round( Upper, 3))  
       }
     }
   
@@ -59,16 +59,15 @@ plotly_plots <- function(df, input_type, input_geo, plot_type) {
     
     df %>%
       # if the demographic is not comparison community then we only want the selected geographic area
-      filter(geo_description == if (input_type != 'Comparison Community') input_geo else .$geo_description,
-             type == if (input_type == 'Comparison Community') 'Comparison Community' else .$type) %>%
+      filter(geo_description == if (input_type != 'Comparison Community') input_geo else .$geo_description) %>%
       plot_ly(x = ~year, y = ~estimate, 
               color = if (input_type == 'Comparison Community') ~geo_description else ~subtype, 
               mode = 'lines', type = 'scatter',
               # tooltip info
               hoverinfo = 'text',
               text = tool_tip()) %>%
-      add_ribbons(ymin = if (binomial==T) ~estimate - moe else ~Lower,
-                  ymax = if (binomial==T) ~estimate + moe else ~Upper,
+      add_ribbons(ymin = if (binomial==F) ~estimate - moe else ~Lower,
+                  ymax = if (binomial==F) ~estimate + moe else ~Upper,
                   alpha = 0.15,
                   line = list(width = 0, dash = 'dot'),
                   showlegend = FALSE,
@@ -97,7 +96,7 @@ plotly_plots <- function(df, input_type, input_geo, plot_type) {
     
   }
 }
-df <- read_csv("https://raw.githubusercontent.com/forsythfuture/indicators/master/shiny_datasets/infant_mortality.csv")
+
 create_datasets <- function(df_list, data_input) {
   
   df_list$data <- read_csv(data_input) 
@@ -142,7 +141,5 @@ ff_data_dt <- function(df, trials = FALSE) {
   datatable(df,
             filter='top', extensions='Buttons', rownames = FALSE,
             #colnames = col_names,
-            options = list(scrollX = TRUE, scrollY = TRUE, dom = 'Bfrtip')) %>%
-    # color cv numbers based on value, only if column named 'cv' exists
-    formatStyle('cv', color = styleInterval(c(12, 30), c('black', 'blue', 'red')))
+            options = list(scrollX = TRUE, scrollY = TRUE, dom = 'Bfrtip'))
 }
