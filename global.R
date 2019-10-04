@@ -38,8 +38,7 @@ plotly_plots <- function(df, input_type, input_geo, plot_type) {
               "<br>Year:  ", year,
               "<br>Demographic:  ", subtype,
               "<br>Estimate:  ", round( estimate, 2),
-              "<br>MOE:  ", round( moe, 2),
-              "<br>SE:  ", round( se, 2),
+              "<br>95% MOE:  ", round( moe, 2),
               "<br>CV:  ", round( cv, 2))
       }
     } else {
@@ -106,7 +105,7 @@ create_datasets <- function(df_list, data_input) {
   df_list$data <- df_list$data %>% 
     # add MOE and CV
     mutate(moe = round(se*1.96, 2),
-           cv = round((estimate/se)*100, 2)) %>%
+           cv = round((se/estimate)*100, 2)) %>%
     # round estiamte and SE after calcualting moe and cv so that
     # moe and cv are based on non-rounded values
     mutate(estimate = round(estimate, 2),
